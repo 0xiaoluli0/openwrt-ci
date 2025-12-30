@@ -114,13 +114,6 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Fix ca-certificates conflict
-      run: |
-        # 强制在配置文件里删除 ca-certificates，并改用 ca-bundle
-        sed -i 's/CONFIG_PACKAGE_ca-certificates=y/# CONFIG_PACKAGE_ca-certificates is not set/g' ipq60xx-6.12-wifi.config
-        sed -i 's/CONFIG_PACKAGE_ca-certificates=m/# CONFIG_PACKAGE_ca-certificates is not set/g' ipq60xx-6.12-wifi.config
-        echo "CONFIG_PACKAGE_ca-bundle=y" >> ipq60xx-6.12-wifi.config
-
     - name: Compile Firmware(开始编译固件)
       id: compile
       run: |
