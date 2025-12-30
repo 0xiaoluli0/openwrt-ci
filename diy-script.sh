@@ -129,8 +129,14 @@ find package/luci-theme-*/* -type f -name '*luci-theme-*' -print -exec sed -i '/
 # 进入 feeds 目录寻找 Makefile 并替换下载地址
 find feeds/nss_packages/ -name "Makefile" | xargs sed -i 's|https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|https://ghfast.top/https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|g'
 
-# 强制修正证书冲突
+# 1. 强制禁用 speedtest-cli 和 ca-certificates
+# 我们不仅要改 =y，还要改 =m，确保它们彻底消失
+sed -i 's/CONFIG_PACKAGE_speedtest-cli=y/# CONFIG_PACKAGE_speedtest-cli is not set/g' .config
+sed -i 's/CONFIG_PACKAGE_speedtest-cli=m/# CONFIG_PACKAGE_speedtest-cli is not set/g' .config
 sed -i 's/CONFIG_PACKAGE_ca-certificates=y/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
 sed -i 's/CONFIG_PACKAGE_ca-certificates=m/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
+
+# 2. 确保 ca-bundle 被选中
+# 先删除可能存在的旧行，再追加新行
 sed -i '/CONFIG_PACKAGE_ca-bundle/d' .config
 echo "CONFIG_PACKAGE_ca-bundle=y" >> .config
