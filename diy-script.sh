@@ -125,18 +125,18 @@ find package/luci-theme-*/* -type f -name '*luci-theme-*' -print -exec sed -i '/
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
-# 修复 nss-firmware 下载失败
-# 进入 feeds 目录寻找 Makefile 并替换下载地址
-find feeds/nss_packages/ -name "Makefile" | xargs sed -i 's|https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|https://ghfast.top/https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|g'
+# 1. 彻底从源码中删除掉 speedtest-cli 文件夹，防止它被任何插件自动勾选
+find ./ -name "speedtest-cli" | xargs rm -rf
+find ./ -name "luci-app-speedtest-cli" | xargs rm -rf
+find ./ -name "luci-app-netspeedtest" | xargs rm -rf
 
-# 1. 强制禁用 speedtest-cli 和 ca-certificates
-# 我们不仅要改 =y，还要改 =m，确保它们彻底消失
-sed -i 's/CONFIG_PACKAGE_speedtest-cli=y/# CONFIG_PACKAGE_speedtest-cli is not set/g' .config
-sed -i 's/CONFIG_PACKAGE_speedtest-cli=m/# CONFIG_PACKAGE_speedtest-cli is not set/g' .config
-sed -i 's/CONFIG_PACKAGE_ca-certificates=y/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
-sed -i 's/CONFIG_PACKAGE_ca-certificates=m/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
+# 2. 强制在 .config 中清理掉相关残留
+sed -i '/speedtest-cli/d' .config
+sed -i '/ca-certificates/d' .config
 
-# 2. 确保 ca-bundle 被选中
-# 先删除可能存在的旧行，再追加新行
+# 3. 强制锁定 ca-bundle (这是 Sing-box 必备)
 sed -i '/CONFIG_PACKAGE_ca-bundle/d' .config
 echo "CONFIG_PACKAGE_ca-bundle=y" >> .config
+
+# 4. 之前的 NSS 固件下载修复（继续保留，非常重要）
+find feeds/nss_packages/ -name "Makefile" | xargs sed -i 's|https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|https://ghfast.top/https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|g'
