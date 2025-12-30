@@ -124,3 +124,7 @@ find package/luci-theme-*/* -type f -name '*luci-theme-*' -print -exec sed -i '/
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
+
+# 修复 nss-firmware 下载失败
+# 进入 feeds 目录寻找 Makefile 并替换下载地址
+find feeds/nss_packages/ -name "Makefile" | xargs sed -i 's|https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|https://ghfast.top/https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|g'
