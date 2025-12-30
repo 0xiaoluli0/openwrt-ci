@@ -19,10 +19,6 @@ rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/luci/applications/luci-app-netdata
 rm -rf feeds/luci/applications/luci-app-serverchan
 
-# 【修复补丁 A】强制移除导致证书冲突的测速插件
-rm -rf feeds/packages/net/speedtest-cli
-rm -rf feeds/luci/applications/luci-app-netspeedtest
-
 # Git稀疏克隆，只克隆指定目录到本地
 function git_sparse_clone() {
   branch="$1" repourl="$2" && shift 2
@@ -109,10 +105,6 @@ sed -i "s/${orig_version}/R${date_version} by Haiibo/g" package/lean/default-set
 # 修复 hostapd 报错
 cp -f $GITHUB_WORKSPACE/scripts/011-fix-mbo-modules-build.patch package/network/services/hostapd/patches/011-fix-mbo-modules-build.patch
 
-
-# 【修复补丁 B】修复 NSS 固件下载 URL
-find feeds/nss_packages/ -name "Makefile" | xargs sed -i 's|https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|https://ghfast.top/https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|g'
-
 # 修复 armv8 设备 xfsprogs 报错
 sed -i 's/TARGET_CFLAGS.*/TARGET_CFLAGS += -DHAVE_MAP_SYNC -D_LARGEFILE64_SOURCE/g' feeds/packages/utils/xfsprogs/Makefile
 
@@ -132,19 +124,3 @@ find package/luci-theme-*/* -type f -name '*luci-theme-*' -print -exec sed -i '/
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
-
-# 1. 彻底从源码中删除掉 speedtest-cli 文件夹，防止它被任何插件自动勾选
-find ./ -name "speedtest-cli" | xargs rm -rf
-find ./ -name "luci-app-speedtest-cli" | xargs rm -rf
-find ./ -name "luci-app-netspeedtest" | xargs rm -rf
-
-# 2. 强制在 .config 中清理掉相关残留
-sed -i '/speedtest-cli/d' .config
-sed -i '/ca-certificates/d' .config
-
-# 3. 强制锁定 ca-bundle (这是 Sing-box 必备)
-sed -i '/CONFIG_PACKAGE_ca-bundle/d' .config
-echo "CONFIG_PACKAGE_ca-bundle=y" >> .config
-
-# 4. 之前的 NSS 固件下载修复（继续保留，非常重要）
-find feeds/nss_packages/ -name "Makefile" | xargs sed -i 's|https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|https://ghfast.top/https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|g'
