@@ -128,3 +128,9 @@ find package/luci-theme-*/* -type f -name '*luci-theme-*' -print -exec sed -i '/
 # 修复 nss-firmware 下载失败
 # 进入 feeds 目录寻找 Makefile 并替换下载地址
 find feeds/nss_packages/ -name "Makefile" | xargs sed -i 's|https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|https://ghfast.top/https://git.codelinaro.org/clo/qsdk/oss/hyfi/qca-nss-fw/-/archive/|g'
+
+# 强制修正证书冲突
+sed -i 's/CONFIG_PACKAGE_ca-certificates=y/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
+sed -i 's/CONFIG_PACKAGE_ca-certificates=m/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
+sed -i '/CONFIG_PACKAGE_ca-bundle/d' .config
+echo "CONFIG_PACKAGE_ca-bundle=y" >> .config
