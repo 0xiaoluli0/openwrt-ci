@@ -36,6 +36,11 @@ jobs:
         echo "--------------------------硬盘信息--------------------------"
         echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
+    - name: Replace broken NSS feed
+      run: |
+        sed -i '/nss_packages/d' openwrt/feeds.conf.default
+        echo "src-git nss_packages https://github.com/qca/nss-packages.git" >> openwrt/feeds.conf.default
+
     - name: Initialization Environment(初始化环境)
       env:
         DEBIAN_FRONTEND: noninteractive
