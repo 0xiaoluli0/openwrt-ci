@@ -131,3 +131,11 @@ find package/luci-theme-*/* -type f -name '*luci-theme-*' -print -exec sed -i '/
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
+
+#【修复补丁 C】终极锁定证书配置，解决 APK 冲突
+# 必须在 feeds install 之后运行，确保此时 .config 已经被加载
+sed -i 's/CONFIG_PACKAGE_ca-certificates=y/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
+sed -i 's/CONFIG_PACKAGE_ca-certificates=m/# CONFIG_PACKAGE_ca-certificates is not set/g' .config
+sed -i 's/CONFIG_PACKAGE_speedtest-cli=y/# CONFIG_PACKAGE_speedtest-cli is not set/g' .config
+sed -i '/CONFIG_PACKAGE_ca-bundle/d' .config
+echo "CONFIG_PACKAGE_ca-bundle=y" >> .config
