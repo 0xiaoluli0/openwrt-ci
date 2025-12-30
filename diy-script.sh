@@ -19,6 +19,10 @@ rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/luci/applications/luci-app-netdata
 rm -rf feeds/luci/applications/luci-app-serverchan
 
+# 【修复补丁 A】强制移除导致证书冲突的测速插件
+rm -rf feeds/packages/net/speedtest-cli
+rm -rf feeds/luci/applications/luci-app-netspeedtest
+
 # Git稀疏克隆，只克隆指定目录到本地
 function git_sparse_clone() {
   branch="$1" repourl="$2" && shift 2
